@@ -1,5 +1,6 @@
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { createGroq } from "@ai-sdk/groq";
 import { createOpenAI } from "@ai-sdk/openai";
 
 // check required env vars
@@ -7,6 +8,7 @@ const requiredEnvVars = [
   "ANTHROPIC_API_KEY",
   "OPENAI_API_KEY",
   "GOOGLE_GENERATIVE_AI_API_KEY",
+  "GROQ_API_KEY",
 ];
 const errors = requiredEnvVars.filter(
   (envVar) => process.env[envVar] === undefined
@@ -54,12 +56,25 @@ export const google = createGoogleGenerativeAI({
     : {}),
 });
 
+export const groq = createGroq({
+  ...(useHelicone
+    ? {
+        baseURL: "https://groq.helicone.ai/openai/v1",
+        headers: {
+          "Helicone-Auth": `Bearer ${process.env.HELICONE_API_KEY}`,
+        },
+      }
+    : {}),
+});
+
 /*
  * allModels is the list of models we want try.
  */
 export const allModels = [
   google("gemini-1.5-pro-latest"),
   google("gemini-2.0-flash-exp"),
+  groq("llama3-groq-8b-8192-tool-use-preview"),
+  groq("llama3-groq-70b-8192-tool-use-preview"),
   anthropic("claude-3-5-sonnet-20241022"),
   anthropic("claude-3-5-haiku-20241022"),
   openai("gpt-4o"),
