@@ -1,5 +1,5 @@
 {
-  "name": "sandbox-xstate",
+  "name": "sandbox-tool-use",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -16,6 +16,9 @@
     "@ai-sdk/openai": "^1.0.11",
     "@modelcontextprotocol/sdk": "^1.0.4",
     "ai": "^4.0.22",
+    "autoevals": "^0.0.111",
+    "braintrust": "^0.0.177",
+    "cli-table3": "^0.6.5",
     "json-schema": "^0.4.0",
     "p-map": "^7.0.3",
     "pino": "^9.6.0",
@@ -23,6 +26,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@types/bun": "^1.1.14",
     "@types/json-schema": "^7.0.15",
     "@types/node": "^22.10.2"
   }

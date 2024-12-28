@@ -2,6 +2,8 @@ import { createAnthropic } from "@ai-sdk/anthropic";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { createGroq } from "@ai-sdk/groq";
 import { createOpenAI } from "@ai-sdk/openai";
+import { LanguageModelV1 } from "ai";
+import { initLogger, wrapAISDKModel } from "braintrust";
 
 // check required env vars
 const requiredEnvVars = [
@@ -9,6 +11,7 @@ const requiredEnvVars = [
   "OPENAI_API_KEY",
   "GOOGLE_GENERATIVE_AI_API_KEY",
   "GROQ_API_KEY",
+  "BRAINTRUST_API_KEY",
 ];
 const errors = requiredEnvVars.filter(
   (envVar) => process.env[envVar] === undefined
@@ -19,58 +22,31 @@ if (errors.length > 0) {
   );
 }
 
-// useHelicone if you want to a nice UI for seeing the raw API calls made
-const useHelicone = process.env.HELICONE_API_KEY !== undefined;
+export const braintrustLogger = initLogger({
+  projectName: "sandbox-tool-use",
+  apiKey: process.env.BRAINTRUST_API_KEY,
+});
 
 export const anthropic = createAnthropic({
-  ...(useHelicone
-    ? {
-        baseURL: "https://anthropic.helicone.ai/v1",
-        headers: {
-          "Helicone-Auth": `Bearer ${process.env.HELICONE_API_KEY}`,
-        },
-      }
-    : {}),
+  apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
 export const openai = createOpenAI({
-  ...(useHelicone
-    ? {
-        baseURL: "https://oai.helicone.ai/v1",
-        headers: {
-          "Helicone-Auth": `Bearer ${process.env.HELICONE_API_KEY}`,
-        },
-      }
-    : {}),
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 export const google = createGoogleGenerativeAI({
-  ...(useHelicone
-    ? {
-        baseURL: "https://gateway.helicone.ai/v1beta",
-        headers: {
-          "Helicone-Auth": `Bearer ${process.env.HELICONE_API_KEY}`,
-          "Helicone-Target-URL": `https://generativelanguage.googleapis.com`,
-        },
-      }
-    : {}),
+  apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
 });
 
 export const groq = createGroq({
-  ...(useHelicone
-    ? {
-        baseURL: "https://groq.helicone.ai/openai/v1",
-        headers: {
-          "Helicone-Auth": `Bearer ${process.env.HELICONE_API_KEY}`,
-        },
-      }
-    : {}),
+  apiKey: process.env.GROQ_API_KEY,
 });
 
 /*
  * allModels is the list of models we want try.
  */
-export const allModels = [
+export const allModels: LanguageModelV1[] = [
   google("gemini-1.5-pro-latest"),
   google("gemini-2.0-flash-exp"),
   groq("llama3-groq-8b-8192-tool-use-preview"),
@@ -79,4 +55,4 @@ export const allModels = [
   anthropic("claude-3-5-haiku-20241022"),
   openai("gpt-4o"),
   openai("gpt-4o-mini"),
-];
+].map((model) => wrapAISDKModel(model));

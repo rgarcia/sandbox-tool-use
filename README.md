@@ -4,14 +4,16 @@ A handful of explorations into using LLMs in combination with browsers, computer
 
 Some guiding principles:
 
-1. Take the perspective of someone trying to build out a simple automation that utilizes tools like browsers and computer use.
+1. Take the perspective of someone trying to build out a simple workflow that utilizes tools like browsers and computer use.
 1. Keep it simple--no agent frameworks etc. Retain control and visibility into the underlying API calls made to the LLM.
 1. Use Vercel's AI SDK (a thin wrapper around the LLM APIs themselves) so that we can easily test out many providers (see [./providers.ts](providers.ts)).
-1. Measure response times of the LLM API calls and tool calls.
+1. Traces and evals for everything. I'm using [braintrust]() for this.
 
 ## Explorations
 
-- [1.basic.ts](./1.basic.ts). Just a simple prompt and response.
+- [1.basic.ts](./1.basic.ts) (and [evals/1.basic.eval.ts](./evals/1.basic.eval.ts)). Just a simple prompt and response.
+
+  - Observations: Only gemini-2.0 and gpt-4o can count the number of R's in the word "strawberry" :)
 
 - [2.tools.ts](./2.tools.ts). Basic tool use. Give the LLM the built-in `fetch` function as a tool. Ask it to figure out your IP address. It should figure out that it should call `fetch` on something like `"https://api.ipify.org` to get it.
 
