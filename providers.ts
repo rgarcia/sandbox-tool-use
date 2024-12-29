@@ -47,8 +47,8 @@ export const groq = createGroq({
  * allModels is the list of models we want try.
  */
 export const allModels: LanguageModelV1[] = [
-  google("gemini-1.5-pro-latest"),
-  google("gemini-2.0-flash-exp"),
+  // google("gemini-1.5-pro-latest"),
+  // google("gemini-2.0-flash-exp"),
   groq("llama3-groq-8b-8192-tool-use-preview"),
   groq("llama3-groq-70b-8192-tool-use-preview"),
   anthropic("claude-3-5-sonnet-20241022"),

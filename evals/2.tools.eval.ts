@@ -1,5 +1,5 @@
-import { LanguageModelV1 } from "ai";
-import { Eval, Evaluator } from "braintrust";
+import { type LanguageModelV1 } from "ai";
+import { Eval, type Evaluator } from "braintrust";
 import toolsTest from "../2.tools";
 import { allModels } from "../providers";
 import { logger } from "../utils";
@@ -9,14 +9,12 @@ async function whatsMyIp(): Promise<string> {
   return (await response.text()).trim();
 }
 
-const containsForModel = function (model: LanguageModelV1) {
-  return (args: { input: string; output: string; expected: string }) => {
-    return {
-      name: `contains for ${model.modelId}`,
-      score: args.output.includes(args.expected) ? 1 : 0,
-    };
+function contains(args: { input: string; output: string; expected: string }) {
+  return {
+    name: "contains",
+    score: args.output.includes(args.expected) ? 1 : 0,
   };
-};
+}
 
 function evalInputForModel(
   model: LanguageModelV1
@@ -39,7 +37,7 @@ function evalInputForModel(
       });
       return result;
     },
-    scores: [containsForModel(model)],
+    scores: [contains],
     trialCount: 5,
     maxConcurrency: 1,
     experimentName: model.modelId,

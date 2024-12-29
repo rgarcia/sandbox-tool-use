@@ -1,10 +1,8 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
-import { Tool } from "@modelcontextprotocol/sdk/types.js";
+import { type Tool } from "@modelcontextprotocol/sdk/types.js";
 import { jsonSchema, type CoreTool } from "ai";
-import { JSONSchema7 } from "json-schema";
-
-type ToolInputSchema = Tool["inputSchema"];
+import type { JSONSchema7 } from "json-schema";
 
 type ToolSetConfig = {
   mcpServers: {

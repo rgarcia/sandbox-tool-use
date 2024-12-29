@@ -1,6 +1,6 @@
-import { LanguageModelV1 } from "ai";
+import { type LanguageModelV1 } from "ai";
 import { Factuality } from "autoevals";
-import { Eval, Evaluator } from "braintrust";
+import { Eval, type Evaluator } from "braintrust";
 import basicTest from "../1.basic";
 import { allModels } from "../providers";
 import { logger } from "../utils";

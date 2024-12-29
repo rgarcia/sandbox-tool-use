@@ -1,7 +1,7 @@
 import { generateText } from "ai";
 import { z } from "zod";
 import { groq } from "./providers";
-import { TestInput, TestResult } from "./types";
+import { type TestInput, type TestResult } from "./types";
 import { logger } from "./utils";
 
 export default async function toolsTest({
