@@ -1,19 +1,16 @@
 import pino from "pino";
-import { PrettyOptions } from "pino-pretty";
+import { PinoPretty } from "pino-pretty";
+const pretty = PinoPretty({ colorize: true, translateTime: "HH:MM:ss.l Z" });
 
 /*
  * colorful logger that supports logging JSON objects
  */
-export const logger = pino({
-  level: process.env.LOG_LEVEL || "info",
-  transport: {
-    target: "pino-pretty",
-    options: {
-      colorize: true,
-      translateTime: "HH:MM:ss.l Z",
-    } as PrettyOptions,
+export const logger = pino(
+  {
+    level: process.env.LOG_LEVEL || "info",
   },
-});
+  pretty
+);
 
 /*
  * timing wrapper that returns a humanized timing string

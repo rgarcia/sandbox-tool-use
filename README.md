@@ -17,7 +17,7 @@ Some guiding principles:
 
 - [2.tools.ts](./2.tools.ts). Basic tool use. Give the LLM the built-in `fetch` function as a tool. Ask it to figure out your IP address. It should figure out that it should call `fetch` on something like `"https://api.ipify.org` to get it.
 
-  - Observations: Claude models are pretty slow relative to OpenAI. Sonnet and Haiku both take 2-3s to respond, whereas 4o and 4o-mini were 900 and 700ms respectively. Gemini models were about 1s.
+  - Observations: Every model tested nails this except (strangely) `llama3-groq-8b-8192-tool-use-preview`.
 
 - [3.mcptools.ts](3.tools.ts). Use Anthropic's [model context protocol](https://modelcontextprotocol.io/) to spin up the same `fetch` tool but as an MCP server. Had to write some code to convert MCP clients into tools (see [./src/index.ts](./src/index.ts))
   - Observations

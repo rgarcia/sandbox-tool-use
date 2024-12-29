@@ -1,43 +1,49 @@
-import { generateText, LanguageModelV1 } from "ai";
-import pMap from "p-map";
+import { generateText } from "ai";
 import { z } from "zod";
-import { allModels } from "./providers";
-import { logger, withTiming } from "./utils";
+import { groq } from "./providers";
+import { TestInput, TestResult } from "./types";
+import { logger } from "./utils";
 
-const run = async (model: LanguageModelV1) => {
-  const { modelId } = model;
-  logger.info({ model: modelId }, "generateText-begin");
-
-  const [result, timing] = await withTiming(async () =>
-    generateText({
-      model,
-      tools: {
-        fetch: {
-          description: "fetch a URL",
-          parameters: z.object({
-            url: z.string().describe("The URL to fetch"),
-          }),
-          execute: async ({ url }) => {
-            logger.info("tool-call-begin");
-            const [response, timing] = await withTiming(
-              async () => await fetch(url)
-            );
-            logger.info(
-              { timing, tool: "fetch", args: { url } },
-              "tool-call-end"
-            );
-            return response.text();
-          },
+export default async function toolsTest({
+  model,
+  logger,
+  input,
+}: TestInput): Promise<TestResult> {
+  const result = await generateText({
+    model,
+    prompt: input,
+    tools: {
+      fetch: {
+        description: "fetch a URL",
+        parameters: z.object({
+          url: z.string().describe("The URL to fetch"),
+        }),
+        execute: async ({ url }) => {
+          return (await fetch(url)).text();
         },
       },
-      prompt: "What's my IP address?",
-    })
-  );
-
+    },
+  });
+  const resultAsText = [
+    result.text,
+    ...result.toolResults.map((r) => r.result),
+  ].join("\n");
   logger.info(
-    { model: modelId, timing, messages: result.response.messages },
-    "generateText-end"
+    {
+      model: model.modelId,
+      result: resultAsText,
+    },
+    "tools"
   );
-};
+  return {
+    result: resultAsText,
+  };
+}
 
-await pMap(allModels, run);
+if (import.meta.main) {
+  toolsTest({
+    model: groq("llama3-groq-70b-8192-tool-use-preview"),
+    input: "What's my IP address?",
+    logger,
+  }).catch(console.error);
+}

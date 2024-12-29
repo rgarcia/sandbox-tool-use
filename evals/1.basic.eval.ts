@@ -1,18 +1,21 @@
 import { LanguageModelV1 } from "ai";
 import { Factuality } from "autoevals";
-import { Eval } from ".";
+import { Eval, Evaluator } from "braintrust";
 import basicTest from "../1.basic";
+import { allModels } from "../providers";
 import { logger } from "../utils";
 
-async function runEvaluation() {
-  await Eval("Strawberry R Counter", {
+function evalInputForModel(
+  model: LanguageModelV1
+): Evaluator<string, string, string> {
+  return {
     data: [
       {
         input: "How many R's are in the word strawberry?",
         expected: "There are 3 R's in the word strawberry.",
       },
     ],
-    task: async (model: LanguageModelV1, input: string) => {
+    task: async (input: string) => {
       const { result } = await basicTest({
         model,
         input,
@@ -23,7 +26,11 @@ async function runEvaluation() {
     scores: [Factuality],
     trialCount: 5,
     maxConcurrency: 1,
-  });
+    experimentName: model.modelId,
+    update: true,
+  };
 }
 
-runEvaluation().catch(console.error);
+allModels.forEach((model) => {
+  Eval("basic prompting", evalInputForModel(model));
+});
