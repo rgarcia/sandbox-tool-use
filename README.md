@@ -9,6 +9,22 @@ Some guiding principles:
 1. Use Vercel's AI SDK (a thin wrapper around the LLM APIs themselves) so that we can easily test out many providers (see [./providers.ts](providers.ts)).
 1. Traces and evals for everything. I'm using [braintrust]() for this.
 
+## Running it
+
+Each exploration below has a standalone file that you can run, e.g.
+
+```
+bun run 1.basic.ts
+```
+
+There is also a corresponding braintrust eval file that does a scaled up version of the standalone file, testing it out with multiple models and multiple attempts with each model, and outputting a percent score for how often it got the task "right."
+
+```
+pnpx braintrust eval --no-progress-bars evals/1.basic.eval.ts
+```
+
+If you're testing out a new eval and don't want results sent to braintrust, you can add the `--no-send-logs` argument to the above.
+
 ## Explorations
 
 - [1.basic.ts](./1.basic.ts) (and [evals/1.basic.eval.ts](./evals/1.basic.eval.ts)). Just a simple prompt and response.
