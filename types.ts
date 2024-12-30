@@ -1,5 +1,5 @@
-import { LanguageModelV1 } from "ai";
-import { Logger } from "pino";
+import type { LanguageModelV1 } from "ai";
+import type { Logger } from "pino";
 
 export type TestResult = {
   result: string;

@@ -1,6 +1,7 @@
+import type { Span } from "@opentelemetry/api";
 import { generateText } from "ai";
-import { google } from "./providers";
-import { TestInput, TestResult } from "./types";
+import { google, tracer } from "./providers";
+import { type TestInput, type TestResult } from "./types";
 import { logger } from "./utils";
 
 export default async function basicTest({
@@ -8,15 +9,26 @@ export default async function basicTest({
   logger,
   input,
 }: TestInput): Promise<TestResult> {
-  logger.info({ model: model.modelId }, "basic");
-  const result = await generateText({
-    model: model,
-    prompt: input,
+  return tracer.startActiveSpan(`basicTest`, async (span: Span) => {
+    logger.info({ model: model.modelId }, "basic");
+    const result = await generateText({
+      model: model,
+      prompt: input,
+      experimental_telemetry: {
+        isEnabled: true,
+        recordInputs: true,
+        recordOutputs: true,
+      },
+    });
+    logger.info(
+      { model: model.modelId, result: result.text },
+      "basic finished"
+    );
+    span.end();
+    return {
+      result: result.text,
+    };
   });
-  logger.info({ model: model.modelId, result: result.text }, "basic finished");
-  return {
-    result: result.text,
-  };
 }
 
 if (import.meta.main) {

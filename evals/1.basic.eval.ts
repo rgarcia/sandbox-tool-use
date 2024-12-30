@@ -26,11 +26,11 @@ function evalInputForModel(
     scores: [Factuality],
     trialCount: 5,
     maxConcurrency: 1,
-    experimentName: model.modelId,
+    experimentName: `basic-prompting-${model.modelId}`,
     update: true,
   };
 }
 
 allModels.forEach((model) => {
-  Eval("basic prompting", evalInputForModel(model));
+  Eval("sandbox-tool-use", evalInputForModel(model));
 });

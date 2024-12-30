@@ -40,11 +40,11 @@ function evalInputForModel(
     scores: [contains],
     trialCount: 5,
     maxConcurrency: 1,
-    experimentName: model.modelId,
+    experimentName: `basic-tool-use-${model.modelId}`,
     update: true,
   };
 }
 
 allModels.forEach((model) => {
-  Eval("basic tool use", evalInputForModel(model));
+  Eval("sandbox-tool-use", evalInputForModel(model));
 });
