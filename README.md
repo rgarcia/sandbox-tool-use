@@ -40,3 +40,8 @@ If you're testing out a new eval and don't want results sent to braintrust, you 
     - Spinning up MCP servers takes time since the default way to run them is as a separate process launched by `npx` or `uvx`. Just for the fetch tool it's about 2.6s. Someone should solve the cold start problem for these...
     - The models struggle with the slightly different MCP server `fetch` tool definition! With the same prompt as in [2.tool.ts](./2.tool.ts), both Claude and OpenAI more often than not **fail** to generate a tool call to `fetch`. Interesting and somewhat disheartening to see this sensitivity to tool definition. Wasn't expecting to see the problem of tool selection for something so simple.
     - Gemini pretty consistently selects the fetch tool and uses it, at least much more often than the other models.
+    - `gpt-4o-mini` does pretty well, scored 80% on getting it right.
+    - Other models fail because the MCP `fetch` tool sets a user agent that is blocked by some "whats my ip" services.
+  - Jobs to be done:
+    - Fix slow spin-up times for MCP servers. Long-running MCP servers with low cold-start times would be a huge improvement.
+    - Make it easy to spin up MCP servers out of local code. Out of the box MCP servers might be kinda mid.
