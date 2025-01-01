@@ -8,28 +8,28 @@ export default async function basicTest({
   logger,
   input,
 }: TestInput): Promise<TestResult> {
-  return traced({ name: "basicTest" }, async (otelSpan, btSpan) => {
-    logger.info({ model: model.modelId }, "basic");
-    const result = await generateText({
-      model: model,
-      prompt: input,
-      experimental_telemetry: {
-        isEnabled: true,
-        recordInputs: true,
-        recordOutputs: true,
-        tracer,
-      },
-    });
-    logger.info(
-      { model: model.modelId, result: result.text },
-      "basic finished"
-    );
-    otelSpan.end();
-    btSpan.end();
-    return {
-      result: result.text,
-    };
-  });
+  return traced(
+    { name: "basic-test", btTracedArgs: { type: "task", event: { input } } },
+    async (otelSpan, btSpan) => {
+      const result = await generateText({
+        model: model,
+        prompt: input,
+        experimental_telemetry: {
+          isEnabled: true,
+          recordInputs: true,
+          recordOutputs: true,
+          tracer,
+        },
+      });
+      logger.info({ model: model.modelId, result: result.text });
+      otelSpan.end();
+      btSpan.log({ output: result.text });
+      btSpan.end();
+      return {
+        result: result.text,
+      };
+    }
+  );
 }
 
 if (import.meta.main) {

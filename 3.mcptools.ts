@@ -1,55 +1,88 @@
-import { generateText, LanguageModelV1 } from "ai";
+import type { Span } from "@opentelemetry/api";
+import { generateText } from "ai";
+import type { Span as BraintrustSpan } from "braintrust";
 import pMap from "p-map";
-import { allModels } from "./providers";
+import { groq, traced, tracer } from "./providers";
 import { createToolSet, defaultToolModifier } from "./src";
-import { logger, withTiming } from "./utils";
+import type { TestInput, TestResult } from "./types";
+import { logger } from "./utils";
 
-async function run(model: LanguageModelV1) {
-  const [toolSet, timingToolSet] = await withTiming(async () =>
-    createToolSet({
-      mcpServers: {
-        fetch: {
-          command: "uvx",
-          args: ["mcp-server-fetch@latest"],
-        },
-      },
-      onCallTool: async (serverName, toolName, args, result) => {
-        logger.info("tool-call-begin");
-        const [_, timing] = await withTiming(async () => await result);
-        logger.info(
-          {
-            tool: toolName,
-            server: serverName,
-            args,
-            timing,
-          },
-          "tool-call"
-        );
-      },
-      toolModifier: defaultToolModifier(model.modelId),
-    })
-  );
-  logger.info({ timing: timingToolSet }, "createToolSet");
-  const { modelId } = model;
-  logger.info({ model: modelId }, "generateText-begin");
-  const [result, timing] = await withTiming(async () =>
-    generateText({
-      model,
-      tools: toolSet.tools,
-      prompt: "What's my IP address?",
-    })
-  );
-  logger.info(
+export default async function mcpToolsTest({
+  model,
+  logger,
+  input,
+}: TestInput): Promise<TestResult> {
+  return traced(
     {
-      model: modelId,
-      timing,
-      text: result.text,
-      toolResults: result.toolResults,
+      name: "mcp-tools-test",
+      btTracedArgs: { type: "task", event: { input } },
     },
-    "generateText"
+    async (otelSpan: Span, btSpan: BraintrustSpan) => {
+      const toolSet = await traced(
+        { name: "createToolSet", btTracedArgs: { type: "function" } },
+        async (otelSpan: Span, btSpan: BraintrustSpan) => {
+          const toolSet = await createToolSet({
+            mcpServers: {
+              fetch: {
+                command: "uvx",
+                args: ["mcp-server-fetch@latest"],
+              },
+            },
+            toolModifier: defaultToolModifier(model.modelId),
+          });
+          otelSpan.end();
+          btSpan.end();
+          return toolSet;
+        }
+      );
+
+      const result = await generateText({
+        model,
+        tools: toolSet.tools,
+        prompt: input,
+        experimental_telemetry: {
+          isEnabled: true,
+          recordInputs: true,
+          recordOutputs: true,
+          tracer,
+        },
+      });
+      const resultAsText = [
+        result.text,
+        ...result.toolResults.map((r: any) => r.result),
+      ].join("\n");
+      logger.info(
+        {
+          model: model.modelId,
+          toolCalls: result.toolCalls,
+          result: resultAsText,
+        },
+        "mcp-tools"
+      );
+      await traced(
+        { name: "closeToolSet", btTracedArgs: { type: "function" } },
+        async (otelSpan: Span, btSpan: BraintrustSpan) => {
+          await pMap(Object.values(toolSet.clients), async (client) => {
+            await client.close();
+          });
+          otelSpan.end();
+          btSpan.end();
+        }
+      );
+      otelSpan.end();
+      btSpan.log({ output: resultAsText });
+      btSpan.end();
+      return {
+        result: resultAsText,
+      };
+    }
   );
-  await pMap(Object.values(toolSet.clients), async (client) => {
-    await client.close();
-  });
 }
-await pMap(allModels, run);
+
+if (import.meta.main) {
+  mcpToolsTest({
+    model: groq("llama3-groq-70b-8192-tool-use-preview"),
+    input: "What's my IP address?",
+    logger,
+  }).catch(console.error);
+}

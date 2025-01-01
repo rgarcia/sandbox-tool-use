@@ -12,9 +12,7 @@ export default async function toolsTest({
   input,
 }: TestInput): Promise<TestResult> {
   return traced(
-    {
-      name: "toolsTest",
-    },
+    { name: "tools-test", btTracedArgs: { type: "task", event: { input } } },
     async (otelSpan: Span, btSpan: BraintrustSpan) => {
       const result = await generateText({
         model,
@@ -23,9 +21,6 @@ export default async function toolsTest({
           isEnabled: true,
           recordInputs: true,
           recordOutputs: true,
-          metadata: {
-            btParentSpanId: btSpan.id,
-          },
           tracer,
         },
         tools: {
@@ -53,6 +48,7 @@ export default async function toolsTest({
         "tools"
       );
       otelSpan.end();
+      btSpan.log({ output: resultAsText });
       btSpan.end();
       return {
         result: resultAsText,
