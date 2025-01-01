@@ -1,7 +1,8 @@
-import * as api from "@opentelemetry/api";
+import type { Span } from "@opentelemetry/api";
 import { generateText } from "ai";
+import { type Span as BraintrustSpan } from "braintrust";
 import { z } from "zod";
-import { groq, tracer } from "./providers";
+import { groq, traced, tracer } from "./providers";
 import { type TestInput, type TestResult } from "./types";
 import { logger } from "./utils";
 
@@ -10,44 +11,54 @@ export default async function toolsTest({
   logger,
   input,
 }: TestInput): Promise<TestResult> {
-  return tracer.startActiveSpan(`toolsTest`, async (span: api.Span) => {
-    const result = await generateText({
-      model,
-      prompt: input,
-      experimental_telemetry: {
-        isEnabled: true,
-        recordInputs: true,
-        recordOutputs: true,
-      },
-      tools: {
-        fetch: {
-          description: "fetch a URL",
-          parameters: z.object({
-            url: z.string().describe("The URL to fetch"),
-          }),
-          execute: async ({ url }) => {
-            return (await fetch(url)).text();
+  return traced(
+    {
+      name: "toolsTest",
+    },
+    async (otelSpan: Span, btSpan: BraintrustSpan) => {
+      const result = await generateText({
+        model,
+        prompt: input,
+        experimental_telemetry: {
+          isEnabled: true,
+          recordInputs: true,
+          recordOutputs: true,
+          metadata: {
+            btParentSpanId: btSpan.id,
+          },
+          tracer,
+        },
+        tools: {
+          fetch: {
+            description: "fetch a URL",
+            parameters: z.object({
+              url: z.string().describe("The URL to fetch"),
+            }),
+            execute: async ({ url }) => {
+              return (await fetch(url)).text();
+            },
           },
         },
-      },
-    });
-    const resultAsText = [
-      result.text,
-      ...result.toolResults.map((r) => r.result),
-    ].join("\n");
-    logger.info(
-      {
-        model: model.modelId,
-        toolCalls: result.toolCalls,
+      });
+      const resultAsText = [
+        result.text,
+        ...result.toolResults.map((r) => r.result),
+      ].join("\n");
+      logger.info(
+        {
+          model: model.modelId,
+          toolCalls: result.toolCalls,
+          result: resultAsText,
+        },
+        "tools"
+      );
+      otelSpan.end();
+      btSpan.end();
+      return {
         result: resultAsText,
-      },
-      "tools"
-    );
-    span.end();
-    return {
-      result: resultAsText,
-    };
-  });
+      };
+    }
+  );
 }
 
 if (import.meta.main) {
