@@ -33,6 +33,7 @@ const requiredEnvVars = [
   "OPENAI_API_KEY",
   "GOOGLE_GENERATIVE_AI_API_KEY",
   "GROQ_API_KEY",
+  "DEEPSEEK_API_KEY",
   "BRAINTRUST_API_KEY",
   "OTEL_EXPORTER_OTLP_ENDPOINT",
   "OTEL_EXPORTER_OTLP_HEADERS",
@@ -207,6 +208,11 @@ export const groq = (modelId: string, settings?: any) => {
   );
 };
 
+export const deepSeek = createOpenAI({
+  baseURL: "https://api.deepseek.com",
+  apiKey: process.env.DEEPSEEK_API_KEY,
+});
+
 /*
  * allModels is the list of models we want try.
  */
@@ -219,4 +225,5 @@ export const allModels: LanguageModelV1[] = [
   anthropic("claude-3-5-haiku-20241022"),
   openai("gpt-4o"),
   openai("gpt-4o-mini"),
+  deepSeek("deepseek-chat"),
 ];
