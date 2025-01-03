@@ -2,7 +2,7 @@ import type { Span } from "@opentelemetry/api";
 import { generateText } from "ai";
 import type { Span as BraintrustSpan } from "braintrust";
 import pMap from "p-map";
-import { groq } from "./providers";
+import { deepSeek } from "./providers";
 import { createToolSet, defaultToolModifier } from "./src";
 import { traced, tracer } from "./tracing";
 import type { TestInput, TestResult } from "./types";
@@ -82,7 +82,7 @@ export default async function mcpToolsTest({
 
 if (import.meta.main) {
   mcpToolsTest({
-    model: groq("llama3-groq-70b-8192-tool-use-preview"),
+    model: deepSeek("deepseek-chat"),
     input: "What's my IP address?",
     logger,
   }).catch(console.error);
