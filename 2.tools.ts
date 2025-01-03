@@ -2,7 +2,8 @@ import type { Span } from "@opentelemetry/api";
 import { generateText } from "ai";
 import { type Span as BraintrustSpan } from "braintrust";
 import { z } from "zod";
-import { groq, traced, tracer } from "./providers";
+import { groq } from "./providers";
+import { traced, tracer } from "./tracing";
 import { type TestInput, type TestResult } from "./types";
 import { logger } from "./utils";
 

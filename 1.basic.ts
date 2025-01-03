@@ -1,5 +1,6 @@
 import { generateText } from "ai";
-import { google, traced, tracer } from "./providers";
+import { google } from "./providers";
+import { traced, tracer } from "./tracing";
 import { type TestInput, type TestResult } from "./types";
 import { logger } from "./utils";
 

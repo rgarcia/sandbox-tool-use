@@ -2,8 +2,9 @@ import type { Span } from "@opentelemetry/api";
 import { generateText } from "ai";
 import type { Span as BraintrustSpan } from "braintrust";
 import pMap from "p-map";
-import { groq, traced, tracer } from "./providers";
+import { groq } from "./providers";
 import { createToolSet, defaultToolModifier } from "./src";
+import { traced, tracer } from "./tracing";
 import type { TestInput, TestResult } from "./types";
 import { logger } from "./utils";
 
