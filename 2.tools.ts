@@ -60,7 +60,7 @@ export default async function toolsTest({
 
 if (import.meta.main) {
   toolsTest({
-    model: groq("llama3-groq-70b-8192-tool-use-preview"),
+    model: groq("llama-3.3-70b-versatile"),
     input: "What's my IP address?",
     logger,
   }).catch(console.error);

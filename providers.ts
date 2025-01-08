@@ -73,8 +73,7 @@ export const deepSeek = createOpenAI({
 export const allModels: LanguageModelV1[] = [
   // google("gemini-1.5-pro-latest"),
   // google("gemini-2.0-flash-exp"),
-  groq("llama3-groq-8b-8192-tool-use-preview"),
-  groq("llama3-groq-70b-8192-tool-use-preview"),
+  groq("llama-3.3-70b-versatile"),
   anthropic("claude-3-5-sonnet-20241022"),
   anthropic("claude-3-5-haiku-20241022"),
   openai("gpt-4o"),
