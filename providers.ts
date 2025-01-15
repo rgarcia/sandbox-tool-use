@@ -1,3 +1,4 @@
+import { createAmazonBedrock } from "@ai-sdk/amazon-bedrock";
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { createGroq } from "@ai-sdk/groq";
@@ -15,6 +16,7 @@ const requiredEnvVars = [
   "BRAINTRUST_API_KEY",
   "OTEL_EXPORTER_OTLP_ENDPOINT",
   "OTEL_EXPORTER_OTLP_HEADERS",
+  "AWS_PROFILE", // assume we're running locally and user has aws profiles configured and labeled in ~/.aws
 ];
 const errors = requiredEnvVars.filter(
   (envVar) => process.env[envVar] === undefined
@@ -67,16 +69,25 @@ export const deepSeek = createOpenAI({
   apiKey: process.env.DEEPSEEK_API_KEY,
 });
 
+export const bedrock = createAmazonBedrock({
+  bedrockOptions: {
+    region: "us-east-2",
+    profile: process.env.AWS_PROFILE,
+  },
+});
+
 /*
  * allModels is the list of models we want try.
  */
 export const allModels: LanguageModelV1[] = [
-  // google("gemini-1.5-pro-latest"),
-  // google("gemini-2.0-flash-exp"),
+  google("gemini-1.5-pro-latest"),
+  google("gemini-2.0-flash-exp"),
   groq("llama-3.3-70b-versatile"),
   anthropic("claude-3-5-sonnet-20241022"),
   anthropic("claude-3-5-haiku-20241022"),
   openai("gpt-4o"),
   openai("gpt-4o-mini"),
   deepSeek("deepseek-chat"),
+  bedrock("us.amazon.nova-pro-v1:0"),
+  bedrock("us.amazon.nova-micro-v1:0"),
 ];

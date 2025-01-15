@@ -26,7 +26,7 @@ export default async function mcpToolsTest({
             mcpServers: {
               fetch: {
                 command: "uvx",
-                args: ["mcp-server-fetch@latest"],
+                args: ["mcp-server-fetch@2025.1.14"],
               },
             },
             toolModifier: defaultToolModifier(model.modelId),
