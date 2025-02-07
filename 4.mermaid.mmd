@@ -1,0 +1,10 @@
+flowchart TD
+    Start([Start]) --> GetEmail[Get Next Email]
+    %% The first time through this state say something like "Ok, let's get started managing your inbox." Next time through, just say what you got to get back to this state, e.g. "email archived" or "email skipped" since it's assumed the user has already been greeted. No matter what, always (1) call the getNextEmail tool and (2) transition to AskUser if and only if there is an email to manage.
+    GetEmail --> NoEmails((No more emails))
+    GetEmail --> AskUser{Ask User}
+    %% Present the user a short summary of the email and ask what they'd like to do with it. ALWAYS use the askUser tool to do this, but include some text in your response that is the short summary of the email.
+    AskUser -->|Archive| ArchiveDB[(Archive in Database)]
+    AskUser -->|Skip| SkipDB[(Mark as Skipped in Database)]
+    ArchiveDB --> GetEmail
+    SkipDB --> GetEmail

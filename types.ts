@@ -8,6 +8,7 @@ export type TestResult = {
 
 export type TestInput = {
   model: LanguageModelV1;
+  system?: string;
   input: string;
   logger: Logger;
 };

@@ -7,7 +7,7 @@ Some guiding principles:
 1. Take the perspective of someone trying to build out a simple workflow that utilizes tools like browsers and computer use.
 1. Keep it simple--no agent frameworks etc. Retain control and visibility into the underlying API calls made to the LLM.
 1. Use Vercel's AI SDK (a thin wrapper around the LLM APIs themselves) so that we can easily test out many providers (see [./providers.ts](providers.ts)).
-1. Traces and evals for everything. I'm using [braintrust]() for this.
+1. Traces and evals for everything. I'm using [braintrust](https://www.braintrust.dev/) for this.
 
 ## Running it
 
@@ -36,6 +36,7 @@ If you're testing out a new eval and don't want results sent to braintrust, you 
   - Observations: Every model tested nails this except (strangely) `llama3-groq-8b-8192-tool-use-preview`.
 
 - [3.mcptools.ts](3.tools.ts). Use Anthropic's [model context protocol](https://modelcontextprotocol.io/) to spin up the same `fetch` tool but as an MCP server. Had to write some code to convert MCP clients into tools (see [./src/index.ts](./src/index.ts))
+
   - Observations
     - Spinning up MCP servers takes time since the default way to run them is as a separate process launched by `npx` or `uvx`. Just for the fetch tool it's about 2-4s. Someone should solve the cold start problem for these...![alt text](image.png)
     - The models struggle with the slightly different MCP server `fetch` tool definition! With the same prompt as in [2.tool.ts](./2.tool.ts), both Claude and OpenAI more often than not **fail** to generate a tool call to `fetch`. Interesting and somewhat disheartening to see this sensitivity to tool definition. Wasn't expecting to see the problem of tool selection for something so simple.
@@ -46,3 +47,6 @@ If you're testing out a new eval and don't want results sent to braintrust, you 
   - Jobs to be done:
     - Fix slow spin-up times for MCP servers. Long-running MCP servers with low cold-start times would be a huge improvement.
     - Make it easy to spin up MCP servers out of local code. Out of the box MCP servers might be kinda mid.
+
+- [4.mermaid.ts](4.mermaid.ts). Use the [Mermaid diagram approach](https://x.com/thankscline/status/1887634849672143009?t=L7Z6MiqXpIaH4V2XvhS8sQ) to multi-step interactions with an LLM. Feeds the system prompt a mermaid diagram with a start and end state, instructing it to keep track of its state by outputting <currentstate>...</currentstate> at every output.
+  - Observations:

@@ -35,7 +35,7 @@ export default async function basicTest({
 
 if (import.meta.main) {
   basicTest({
-    model: google("gemini-2.0-flash-exp"),
+    model: google("gemini-2.0-flash-001"),
     input: "How many R's are in the word strawberry?",
     logger,
   }).catch(console.error);

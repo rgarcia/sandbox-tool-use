@@ -80,13 +80,18 @@ export const bedrock = createAmazonBedrock({
  * allModels is the list of models we want try.
  */
 export const allModels: LanguageModelV1[] = [
-  google("gemini-1.5-pro-latest"),
-  google("gemini-2.0-flash-exp"),
+  google("gemini-2.0-flash-001"),
+  google("gemini-2.0-flash-lite-preview-02-05"),
   groq("llama-3.3-70b-versatile"),
+  groq("llama-3.1-8b-instant"),
+  groq("mixtral-8x7b-32768"),
   anthropic("claude-3-5-sonnet-20241022"),
   anthropic("claude-3-5-haiku-20241022"),
   openai("gpt-4o"),
   openai("gpt-4o-mini"),
+  openai("o1"),
+  openai("o3-mini"),
+  deepSeek("deepseek-reasoner"),
   deepSeek("deepseek-chat"),
   bedrock("us.amazon.nova-pro-v1:0"),
   bedrock("us.amazon.nova-micro-v1:0"),
